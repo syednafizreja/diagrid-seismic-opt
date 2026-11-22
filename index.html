@@ -3,7 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Diagrid Seismic Optimization — NiTi vs Steel</title>
+<title>Diagrid Seismic Studio — NiTi vs Steel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script type="importmap">
 {
@@ -14,74 +17,122 @@
 }
 </script>
 </head>
-<body>
-<header id="topbar">
-  <div class="brand">
-    <h1>Diagrid Seismic Optimization</h1>
-    <p>Superelastic NiTi self-centering fuses vs conventional yielding steel &middot; certified Pareto canopies</p>
-  </div>
-  <div class="controls-top">
-    <div class="segmented" id="mode-toggle">
-      <button data-mode="pareto" class="active">Certified Pareto</button>
-      <button data-mode="explore">Live Sliders</button>
+<body class="theme-light">
+<div id="stage">
+  <div id="viewport"></div>
+  <div id="loading" class="overlay">Loading artifacts&hellip;</div>
+
+  <aside id="rail">
+    <button id="rail-collapse" title="Collapse inspector rail">&#10096;</button>
+    <div class="rail-scroll">
+      <header class="rail-head">
+        <div class="rail-title">Inspector</div>
+        <div class="rail-sub">Diagrid Seismic Studio</div>
+      </header>
+      <div class="seg full" id="mode-toggle">
+        <button data-mode="pareto" class="active">Certified Pareto</button>
+        <button data-mode="explore">Live Sliders</button>
+      </div>
+
+      <section id="pareto-controls" class="panel">
+        <h3>Certified Pareto designs</h3>
+        <p class="hint">Click a point on the <strong>Pareto Front</strong> tab to load one of the 8 exact OpenSeesPy-certified designs.</p>
+        <div id="design-readout" class="readout"></div>
+      </section>
+
+      <section id="explore-controls" class="panel hidden">
+        <h3>Live design exploration</h3>
+        <p class="hint">Mat&eacute;rn-5/2 GP surrogate &middot; mean &plusmn; 1.96&sigma;. Unsafe 95% UCB drift (&gt;2.0%) is flagged.</p>
+        <div id="sliders"></div>
+        <div class="seg small" id="explore-fuse">
+          <button data-fuse="steel">Steel</button>
+          <button data-fuse="niti" class="active">NiTi</button>
+        </div>
+      </section>
+
+      <section class="panel" id="charts-panel">
+        <nav id="chart-tabs" class="tabs">
+          <button data-tab="hysteresis" class="active">Hysteresis</button>
+          <button data-tab="pareto">Pareto Front</button>
+          <button data-tab="diffid">PyTorch ID</button>
+        </nav>
+        <div class="chart-wrap">
+          <canvas id="chart-hysteresis" class="chart-canvas"></canvas>
+          <canvas id="chart-pareto" class="chart-canvas hidden"></canvas>
+          <canvas id="chart-diffid" class="chart-canvas hidden"></canvas>
+          <div id="pareto-tooltip" class="tooltip hidden"></div>
+        </div>
+        <div id="chart-caption" class="hint"></div>
+      </section>
     </div>
-    <select id="display-mode" title="Display mode">
-      <option value="architectural">Architectural</option>
-      <option value="utilization">Utilization</option>
-      <option value="technical">Technical</option>
-      <option value="wireframe">Wireframe</option>
-    </select>
-    <button id="export-png" title="Export viewport as PNG">Export PNG</button>
-  </div>
-</header>
-
-<main id="layout">
-  <aside id="sidebar">
-    <section id="pareto-controls" class="mode-panel">
-      <h2>Certified Pareto designs</h2>
-      <p class="hint">Click a point on the <strong>Pareto Front</strong> tab to load one of the 8 exact OpenSeesPy-certified designs.</p>
-      <button id="play-quake">&#9654; Play 0.40g Earthquake (Steel vs NiTi)</button>
-      <div id="design-readout" class="readout"></div>
-    </section>
-
-    <section id="explore-controls" class="mode-panel hidden">
-      <h2>Live design exploration</h2>
-      <p class="hint">Mat&eacute;rn-5/2 GP surrogate &middot; mean &plusmn; 1.96&sigma;. Unsafe 95% UCB drift (&gt; 2.0%) is flagged.</p>
-      <div id="sliders"></div>
-      <div id="explore-fuse" class="segmented small">
-        <button data-fuse="steel">Steel</button>
-        <button data-fuse="niti" class="active">NiTi</button>
-      </div>
-    </section>
-
-    <section id="charts">
-      <nav id="chart-tabs">
-        <button data-tab="hysteresis" class="active">Hysteresis</button>
-        <button data-tab="pareto">Pareto Front</button>
-        <button data-tab="diffid">PyTorch Inverse ID</button>
-      </nav>
-      <div class="chart-wrap">
-        <canvas id="chart-hysteresis" class="chart-canvas"></canvas>
-        <canvas id="chart-pareto" class="chart-canvas hidden"></canvas>
-        <canvas id="chart-diffid" class="chart-canvas hidden"></canvas>
-      </div>
-      <div id="chart-caption" class="hint"></div>
-    </section>
   </aside>
 
-  <section id="viewport-wrap">
-    <div id="viewport"></div>
-    <div id="loading" class="overlay">Loading artifacts&hellip;</div>
-  </section>
-</main>
+  <div id="badge" class="glass">
+    <div class="badge-title">Diagrid Seismic Studio</div>
+    <div class="badge-sub">Curved glulam diagrid canopy &middot; NiTi self-centering vs. yielding steel</div>
+    <div class="pill pill-ok">OpenSeesPy Verified &middot; Tangent &lt;1e-7 &middot; D &ge; 0 &middot; 0% False-Safe</div>
+  </div>
 
-<footer id="kpi-strip">
-  <div class="kpi" data-kpi="peak_drift_pct"><span class="kpi-label">Peak drift (%)</span><span class="kpi-value">&mdash;</span></div>
-  <div class="kpi" data-kpi="abs_residual_drift_pct"><span class="kpi-label">Residual drift (%)</span><span class="kpi-value">&mdash;</span></div>
-  <div class="kpi" data-kpi="grav_defl_mm"><span class="kpi-label">Gravity defl. (mm)</span><span class="kpi-value">&mdash;</span></div>
-  <div class="kpi" data-kpi="c_total_per_m2"><span class="kpi-label">Carbon (kgCO&#8322;e/m&sup2;)</span><span class="kpi-value">&mdash;</span></div>
-</footer>
+  <div id="telemetry" class="glass">
+    <div class="kpi"><label>Lifecycle Carbon</label><div class="kpi-val" id="kpi-carbon">&mdash;</div><div class="kpi-sub" id="kpi-carbon-sub">A1&ndash;A3 &middot; Repair</div></div>
+    <div class="kpi"><label>Peak / Residual Drift</label><div class="kpi-val" id="kpi-drift">&mdash;</div><div class="kpi-sub" id="kpi-drift-sub">Steel &Delta; NiTi</div></div>
+    <div class="kpi"><label>Max Utilization</label><div class="kpi-val" id="kpi-util">&mdash;</div><div class="kpi-sub" id="kpi-util-sub">governing case</div></div>
+    <div class="kpi kpi-conf"><label>Solver Confidence</label><div class="pill" id="conf-pill">&mdash;</div><div class="kpi-sub" id="conf-sub">&nbsp;</div></div>
+  </div>
 
+  <div id="replay" class="glass">
+    <div class="seg" id="replay-fuse">
+      <button data-fuse="steel">Steel</button>
+      <button data-fuse="niti" class="active">NiTi</button>
+    </div>
+    <button id="play-quake" title="Play / pause the 0.40g quake">&#9654; Play 0.40g Quake</button>
+    <div class="scrub">
+      <span id="scrub-time" class="mono">0.00s</span>
+      <input type="range" id="scrub" min="0" max="59" step="1" value="0" title="Scrub the quake timeline (0&ndash;18 s)">
+      <span class="scrub-end mono">18.00s</span>
+    </div>
+    <div class="seg small" id="speed">
+      <button data-speed="0.5">0.5&times;</button>
+      <button data-speed="1" class="active">1&times;</button>
+    </div>
+    <div class="seg small" id="mag">
+      <button data-mag="1">1&times;</button>
+      <button data-mag="5">5&times;</button>
+      <button data-mag="10" class="active">10&times;</button>
+    </div>
+  </div>
+
+  <div id="dock" class="glass">
+    <div class="dock-group">
+      <span class="dock-label">Camera</span>
+      <div class="seg">
+        <button data-cam="perspective" class="active">Perspective</button>
+        <button data-cam="elevation">Elevation</button>
+        <button data-cam="plan">Plan</button>
+        <button data-cam="fuse">Fuse Close-Up</button>
+      </div>
+    </div>
+    <div class="dock-group">
+      <span class="dock-label">Display</span>
+      <div class="seg" id="display-mode">
+        <button data-display="architectural" class="active">Architectural</button>
+        <button data-display="utilization">Utilization</button>
+        <button data-display="technical">Technical</button>
+        <button data-display="wireframe">Wireframe</button>
+      </div>
+    </div>
+    <div class="dock-group">
+      <span class="dock-label">Layers</span>
+      <div class="seg">
+        <button id="toggle-glazing" class="active">Glazing</button>
+        <button id="toggle-grid" class="active">Grid</button>
+        <button id="toggle-axes" class="active">Axes</button>
+        <button id="toggle-theme">Dark Lab</button>
+        <button id="export-png">Export 2&times; PNG</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script type="module" src="script.js"></script>
 </body>
 </html>
