@@ -197,7 +197,7 @@ function initScene() {
   camera.position.set(29, 20, 32);
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true; controls.dampingFactor = 0.07;
-  controls.target.set(0, 4, 0); controls.maxPolarAngle = Math.PI * 0.495;
+  controls.target.set(0, 4, 0); controls.maxPolarAngle = Math.PI * 0.93;
   controls.minDistance = 2; controls.maxDistance = 180;
 
   hemiLight = new THREE.HemisphereLight(0xdcecff, 0x8c7b6a, 1.05); scene.add(hemiLight);
@@ -389,7 +389,7 @@ function modelSpan() {
 }
 function setCameraPreset(name) {
   const s = modelSpan();
-  if (name === 'perspective') flyTo([s * 1.35, s * 0.85, s * 1.45], [0, 4, 0]);
+  if (name === 'perspective') flyTo([s * 1.35, s * 0.85, s * 1.45], [0, 5, 0]);
   else if (name === 'elevation') flyTo([0, 6, s * 1.85], [0, 4, 0]);
   else if (name === 'plan') flyTo([0, s * 2.4, 0.01], [0, 0, 0]);
   else if (name === 'fuse') {
