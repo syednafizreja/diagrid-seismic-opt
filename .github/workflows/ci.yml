@@ -10,7 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11"]
+        # OpenSeesPy's Linux wheel (openseespylinux 3.8.0.0) requires Python >= 3.12,
+        # so CI must use 3.12 (matches the local .venv at 3.12.15). 3.11 cannot
+        # satisfy the openseespy>=3.8 dependency on Linux.
+        python-version: ["3.12"]
     steps:
       - uses: actions/checkout@v4
 

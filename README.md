@@ -54,7 +54,7 @@ scripts/              plot_day1..4.py, generate_dataset.py
 data/                 verified_lhs_dataset.csv + Day 4 JSON artifacts (served by the web app)
 figures/              day1..day4 figures
 index.html, style.css, script.js   the interactive viewer
-.github/workflows/ci.yml           Python 3.11 CI (pytest)
+.github/workflows/ci.yml           Python 3.12 CI (pytest)
 docs/VALIDATION.md                 verified-numbers dossier
 ```
 
