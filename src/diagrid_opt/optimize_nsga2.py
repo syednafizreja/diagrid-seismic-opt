@@ -34,6 +34,18 @@ OUTPUT_PATH = (
     Path(__file__).resolve().parents[2] / "data" / "pareto_canopies.json"
 )
 DIVISION_VALUES = (6, 8, 10, 12)
+DETAIL_DECIMALS = 5
+
+
+def _round_floats(obj: Any, ndigits: int) -> Any:
+    """Recursively round floats for a compact, Pages-friendly JSON export."""
+    if isinstance(obj, float):
+        return round(obj, ndigits)
+    if isinstance(obj, list):
+        return [_round_floats(item, ndigits) for item in obj]
+    if isinstance(obj, dict):
+        return {key: _round_floats(value, ndigits) for key, value in obj.items()}
+    return obj
 
 
 class CanopyOptimizationProblem(ElementwiseProblem):
@@ -169,9 +181,11 @@ def _frame_payload(history: dict[str, Any]) -> dict[str, Any]:
     return {
         "time_s": times[selected].tolist(),
         "node_ids": np.asarray(history["node_ids"], dtype=int).tolist(),
+        # Store translational DOF only (x, y, z); the viewer never uses
+        # rotations, and dropping them roughly halves the payload size.
         "nodal_displacements_m_rad": np.asarray(
             history["nodal_displacements_m_rad"], dtype=float
-        )[selected].tolist(),
+        )[selected][:, :, :3].tolist(),
         "lead_fuse_strain": np.asarray(
             history["lead_fuse_strain"], dtype=float
         )[selected].tolist(),
@@ -515,12 +529,12 @@ def run_optimization(
                 "by_case": certification_stats,
             },
         },
-        "designs": certified_designs,
+        "designs": _round_floats(certified_designs, DETAIL_DECIMALS),
     }
     destination = Path(output_path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(
-        json.dumps(payload, indent=2, allow_nan=False) + "\n",
+        json.dumps(payload, separators=(",", ":"), allow_nan=False) + "\n",
         encoding="utf-8",
     )
     return payload

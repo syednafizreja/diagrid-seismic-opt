@@ -23,7 +23,8 @@ def test_nsga_problem_rounds_divisions_and_uses_conservative_constraints():
         np.array([20.0, 0.15, 8.6, 0.35, 150.0]), output
     )
 
-    assert design.diagrid_divisions == 10
+    # Nearest allowed even division to 8.6 is 8 (|8.6-8|=0.6 < |8.6-10|=1.4).
+    assert design.diagrid_divisions == 8
     np.testing.assert_allclose(output["F"], [200.0, -20.0])
     np.testing.assert_allclose(
         output["G"],

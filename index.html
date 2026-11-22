@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagrid Seismic Optimization — NiTi vs Steel</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<header id="topbar">
+  <div class="brand">
+    <h1>Diagrid Seismic Optimization</h1>
+    <p>Superelastic NiTi self-centering fuses vs conventional yielding steel &middot; certified Pareto canopies</p>
+  </div>
+  <div class="controls-top">
+    <div class="segmented" id="mode-toggle">
+      <button data-mode="pareto" class="active">Certified Pareto</button>
+      <button data-mode="explore">Live Sliders</button>
+    </div>
+    <select id="display-mode" title="Display mode">
+      <option value="architectural">Architectural</option>
+      <option value="utilization">Utilization</option>
+      <option value="technical">Technical</option>
+      <option value="wireframe">Wireframe</option>
+    </select>
+    <button id="export-png" title="Export viewport as PNG">Export PNG</button>
+  </div>
+</header>
+
+<main id="layout">
+  <aside id="sidebar">
+    <section id="pareto-controls" class="mode-panel">
+      <h2>Certified Pareto designs</h2>
+      <p class="hint">Click a point on the <strong>Pareto Front</strong> tab to load one of the 8 exact OpenSeesPy-certified designs.</p>
+      <button id="play-quake">&#9654; Play 0.40g Earthquake (Steel vs NiTi)</button>
+      <div id="design-readout" class="readout"></div>
+    </section>
+
+    <section id="explore-controls" class="mode-panel hidden">
+      <h2>Live design exploration</h2>
+      <p class="hint">Mat&eacute;rn-5/2 GP surrogate &middot; mean &plusmn; 1.96&sigma;. Unsafe 95% UCB drift (&gt; 2.0%) is flagged.</p>
+      <div id="sliders"></div>
+      <div id="explore-fuse" class="segmented small">
+        <button data-fuse="steel">Steel</button>
+        <button data-fuse="niti" class="active">NiTi</button>
+      </div>
+    </section>
+
+    <section id="charts">
+      <nav id="chart-tabs">
+        <button data-tab="hysteresis" class="active">Hysteresis</button>
+        <button data-tab="pareto">Pareto Front</button>
+        <button data-tab="diffid">PyTorch Inverse ID</button>
+      </nav>
+      <div class="chart-wrap">
+        <canvas id="chart-hysteresis" class="chart-canvas"></canvas>
+        <canvas id="chart-pareto" class="chart-canvas hidden"></canvas>
+        <canvas id="chart-diffid" class="chart-canvas hidden"></canvas>
+      </div>
+      <div id="chart-caption" class="hint"></div>
+    </section>
+  </aside>
+
+  <section id="viewport-wrap">
+    <div id="viewport"></div>
+    <div id="loading" class="overlay">Loading artifacts&hellip;</div>
+  </section>
+</main>
+
+<footer id="kpi-strip">
+  <div class="kpi" data-kpi="peak_drift_pct"><span class="kpi-label">Peak drift (%)</span><span class="kpi-value">&mdash;</span></div>
+  <div class="kpi" data-kpi="abs_residual_drift_pct"><span class="kpi-label">Residual drift (%)</span><span class="kpi-value">&mdash;</span></div>
+  <div class="kpi" data-kpi="grav_defl_mm"><span class="kpi-label">Gravity defl. (mm)</span><span class="kpi-value">&mdash;</span></div>
+  <div class="kpi" data-kpi="c_total_per_m2"><span class="kpi-label">Carbon (kgCO&#8322;e/m&sup2;)</span><span class="kpi-value">&mdash;</span></div>
+</footer>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>

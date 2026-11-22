@@ -134,10 +134,17 @@ def _cv_metrics(
     truth: np.ndarray, mean: np.ndarray, std: np.ndarray
 ) -> dict[str, float]:
     residual = truth - mean
+    total_ss = float(np.sum((truth - np.mean(truth)) ** 2))
+    residual_ss = float(np.sum(residual**2))
+    if total_ss > 0.0:
+        r2 = 1.0 - residual_ss / total_ss
+    else:
+        r2 = 1.0 if residual_ss == 0.0 else 0.0
     return {
         "rmse": float(np.sqrt(np.mean(residual**2))),
         "mae": float(np.mean(np.abs(residual))),
         "mean_predictive_std": float(np.mean(std)),
+        "r2": float(r2),
     }
 
 
@@ -207,6 +214,7 @@ def fit_grouped_cv_surrogates(
     fold_sizes = [int(test.size) for _, test in split_indices]
     trained: dict[str, CaseSurrogate] = {}
     per_case_validation: dict[str, Any] = {}
+    oof_peak_drift: dict[str, Any] = {}
     all_truth: list[np.ndarray] = []
     all_mean: list[np.ndarray] = []
     all_std: list[np.ndarray] = []
@@ -241,6 +249,11 @@ def fit_grouped_cv_surrogates(
 
         assert oof_peak is not None
         case_validation["false_safe_rate"] = _false_safe_rates(*oof_peak)
+        oof_peak_drift[fuse_type] = {
+            "truth": oof_peak[0].tolist(),
+            "mean": oof_peak[1].tolist(),
+            "std": oof_peak[2].tolist(),
+        }
         all_truth.append(oof_peak[0])
         all_mean.append(oof_peak[1])
         all_std.append(oof_peak[2])
@@ -272,6 +285,7 @@ def fit_grouped_cv_surrogates(
         "fold_sizes": fold_sizes,
         "span_quartile_by_row": groups.tolist(),
         "per_case": per_case_validation,
+        "oof_peak_drift_pct": oof_peak_drift,
         "false_safe_rate": _false_safe_rates(
             pooled_truth, pooled_mean, pooled_std
         ),

@@ -228,7 +228,11 @@ def _fit_curves(
 
 def _synthetic_data(seed: int) -> dict[str, Any]:
     params = NiTiParams()
-    strain = 0.045 * np.sin(np.linspace(0.0, 10.0 * np.pi, 301))
+    # Ramped multi-amplitude nested cycles (+/-1.5% -> +/-6%). A single constant
+    # amplitude leaves the reverse-transformation parameters and eps_L weakly
+    # identifiable; nested loops pin every parameter inside the 8% gate.
+    phase = np.linspace(0.0, 1.0, 601)
+    strain = 0.06 * (0.25 + 0.75 * phase) * np.sin(2.0 * np.pi * 5.0 * phase)
     true_stress = _exact_stress_history(strain, params)
     noise_sigma = 0.03 * float(np.max(np.abs(true_stress)))
     rng = np.random.default_rng(seed)
@@ -246,7 +250,7 @@ def run_parameter_identification(
     output_path: str | Path = OUTPUT_PATH,
     *,
     adam_steps: int = 300,
-    lbfgs_steps: int = 50,
+    lbfgs_steps: int = 80,
     bootstrap_members: int = BOOTSTRAP_MEMBERS,
     seed: int = RANDOM_SEED,
 ) -> dict[str, Any]:

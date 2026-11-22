@@ -156,3 +156,35 @@ Implement this exact rate-independent 1D model using signed martensite fraction 
 - Preserve the signed mean roof drift over the final 1.0 s separately from its absolute magnitude so the Steel/NiTi residual-drift comparison retains direction.
 - Run independent design/fuse cases in isolated worker processes; OpenSees model state must not be shared between workers.
 - Save paired, fully verified designs to `data/verified_lhs_dataset.csv`. Exclude a design unless both fuse cases pass, keep deterministic design ordering, and report excluded cases with their failure reasons.
+
+## 7. Day 4 Specification: GP Surrogate, NSGA-II Pareto Optimization, and Differentiable NiTi Identification
+
+### 7.1 Matérn-5/2 Gaussian-Process Surrogate (`surrogate_gp.py`)
+- Features: `span_m`, `arch_rise_ratio`, `diagrid_divisions`, `glulam_depth_m`, `niti_fuse_area_mm2` (the five LHS design dimensions).
+- Targets per fuse case: `peak_drift_pct`, `abs_residual_drift_pct`, `grav_defl_mm`, `c_total_per_m2`.
+- Kernel `ConstantKernel * Matern(nu=2.5) + WhiteKernel` with `StandardScaler` feature standardization.
+- Grouped 4-fold cross-validation via `GroupKFold` over span quartiles (no leakage between span groups), producing 20/20/20/20 held-out folds.
+- Verification gates:
+  1. Exported weights (`alpha`, `cholesky`, `constant_value`, `length_scale`, `noise_level`), `scaler`, and `X_train_standardized` reproduce scikit-learn `predict` mean/std to `< 1e-6` (browser-replayable Matérn-5/2 evaluation).
+  2. The false-safe peak-drift rate using the 95% upper confidence bound (`mean + 1.96σ`) is strictly lower than the mean-only rate (`ucb_95 < mean`); a design is unsafe when true peak drift exceeds `2.0%`.
+  3. Grouped-CV R² is reported per target for `docs/VALIDATION.md`, and out-of-fold peak-drift `(truth, mean, std)` is exported under `validation.oof_peak_drift_pct`.
+
+### 7.2 NSGA-II Multi-Objective Pareto Optimization (`optimize_nsga2.py`)
+- Two objectives: minimize lifecycle carbon `c_total_per_m2` and maximize clear span `span` (minimize `-span`).
+- Conservative 95% UCB constraints: `peak_drift_pct + 1.96σ <= 2.0%` and `grav_defl_mm + 1.96σ <= span*1000/250`.
+- `diagrid_divisions` snapped to the nearest allowed even value `{6, 8, 10, 12}`; `branch_spread = 0.17 * span`.
+- NSGA-II, population 60, 60 generations, seed 42, run independently per fuse case.
+- Certification: every exported front design is re-run through **exact OpenSeesPy** (static gravity + wind uplift and a 0.40 g, seed-101, 1800-step transient). No surrogate value is substituted for a certified KPI.
+- Verification gates:
+  1. Exactly **8** certified designs are exported — 4 `steel` + 4 `niti` front cases.
+  2. Each design's exact static equilibrium error `< 1e-4` and `converged_steps == 1800`.
+  3. **Zero** false-safe designs on the certified front: any candidate whose exact peak drift `> 2.0%` or exact gravity deflection exceeds its limit is rejected and counted in `meta.certification`.
+  4. Each design carries `nodes`, `elements` (with per-group static utilizations), `kpis`, and a ~60-frame `quake_frames` (translational nodal displacements + lead-fuse strain/stress), rounded to 5 decimal places and serialized compactly for a Pages-friendly export (< 2 MB).
+
+### 7.3 Differentiable NiTi Parameter Identification (`diff_ident_sciml.py`)
+- Smooth, differentiable Auricchio-Sacco surrogate in PyTorch (`smooth_stress_history`); observed data are generated from the exact model with 3% Gaussian sensor noise on a ramped multi-amplitude (±1.5%→±6%) nested cyclic strain history.
+- Optimization: Adam (300 steps) followed by L-BFGS (strong-Wolfe line search); parameters bounded via a logit/sigmoid map.
+- Uncertainty: 20-member residual-resampling bootstrap → 95% percentile confidence intervals per parameter.
+- Verification gates:
+  1. Every recovered parameter (`E`, `sigma_Ms`, `sigma_Mf`, `sigma_As`, `sigma_Af`, `eps_L`) is within **< 8%** relative error of the true value (`meta.all_parameters_within_8_percent`).
+  2. 95% CIs are reported for all six parameters.
