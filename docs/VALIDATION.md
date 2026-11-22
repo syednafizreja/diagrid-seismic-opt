@@ -62,6 +62,20 @@ residual bootstrap. Gate: **every parameter within 8%**.
 Max error **7.28%** (eps_L) `< 8%` gate; every parameter carries a 20-member
 bootstrap 95% CI.
 
+## Figures
+
+![NiTi constitutive](../figures/day1_niti_constitutive.png)
+
+![3D diagrid](../figures/day1_diagrid_3d.png)
+
+![Steel vs NiTi seismic](../figures/day2_steel_vs_niti_seismic.png)
+
+![Carbon vs seismic tradeoff](../figures/day3_carbon_seismic_tradeoff.png)
+
+![GP surrogate and certified Pareto](../figures/day4_gp_and_pareto.png)
+
+![Differentiable NiTi inverse](../figures/day4_diff_id_niti.png)
+
 ## Reproduce
 
 ```powershell

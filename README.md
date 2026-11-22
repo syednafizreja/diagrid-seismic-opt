@@ -30,6 +30,17 @@ noisy cyclic data?
 
 See [`docs/VALIDATION.md`](docs/VALIDATION.md) for the full verified-numbers dossier.
 
+## Figures
+
+| Constitutive + geometry (Day 1) | Multi-hazard seismic (Day 2) |
+|---|---|
+| ![NiTi constitutive](figures/day1_niti_constitutive.png) | ![Steel vs NiTi seismic](figures/day2_steel_vs_niti_seismic.png) |
+| ![3D diagrid](figures/day1_diagrid_3d.png) | ![Carbon vs seismic tradeoff](figures/day3_carbon_seismic_tradeoff.png) |
+
+| GP surrogate + certified Pareto (Day 4) | Differentiable NiTi inverse (Day 4) |
+|---|---|
+| ![GP and Pareto](figures/day4_gp_and_pareto.png) | ![Differentiable NiTi inverse](figures/day4_diff_id_niti.png) |
+
 ## What is built
 
 - **Days 1–3** — exact 1D Auricchio–Sacco NiTi constitutive model, 3D parametric
