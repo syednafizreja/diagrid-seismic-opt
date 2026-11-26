@@ -1,0 +1,15 @@
+% Means from data/verified_lhs_dataset.csv (80 paired designs, seed 101, 0.40 g).
+% Screening rates from data/gp_surrogate.json validation.per_case.
+\begin{tabular}{lrrl}
+\toprule
+Quantity & Yielding steel & NiTi & Unit \\
+\midrule
+Peak roof drift, mean & 1.788 & 3.397 & \% \\
+Absolute residual drift, mean & 0.0659 & 0.0175 & \% \\
+Lifecycle intensity, mean & 174.76 & 184.24 & kgCO$_2$e/m$^2$ \\
+A1--A3 carbon, mean & 17669.4 & 18290.3 & kgCO$_2$e \\
+False-safe rate, mean rule & 0.050 & 0.050 & fraction of 80 \\
+False-safe rate, 95\% UCB & 0.000 & 0.000 & fraction of 80 \\
+Peak-drift grouped-CV $R^2$ & 0.379 & 0.808 & -- \\
+\bottomrule
+\end{tabular}
