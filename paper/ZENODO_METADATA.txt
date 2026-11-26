@@ -1,0 +1,15 @@
+Title: Thermodynamically Consistent 1D Superelastic NiTi Constitutive Modeling, Inverse Identification, and Seismic-Carbon Trade-Offs in Diagrid Frames
+
+Author: Syed Nafiz Reja Hasib
+ORCID: 0009-0002-7162-7890
+
+Resource type: Publication / Preprint
+
+License: CC-BY-4.0
+
+Abstract:
+Superelastic NiTi is often added to a frame to buy recentering. The inventory prices it at 28.0 kgCO₂e/kg, against 1.55 kgCO₂e/kg for steel, so recentering has to be read with peak drift and carbon. One isothermal return map is identified under noise and then used to set a paired diagrid comparison. The map has a signed martensite fraction, a monitored Helmholtz energy, and a piecewise algorithmic tangent. On the audited cycles the discrete dissipation stays above −10⁻⁹ MPa, and the tangent matches a central difference to a relative error of 1.85×10⁻¹⁰. A PyTorch stand-in, trained at 3% stress noise, recovers the six parameters to within 8%. The worst miss is the transformation strain, at 7.28%. The frame does not integrate the return map. An OpenSeesPy flag-shaped fuse takes the same stresses and the same transformation tangent. On 80 paired canopies and one synthetic 0.40g record, NiTi lowers the mean absolute residual roof drift from 0.0659% to 0.0175%. Mean peak roof drift rises from 1.788% to 3.397% on every geometry, and cradle-to-gate carbon rises by 620.9 kgCO₂e. Lifecycle intensity is higher on 66 of the 80 designs. Grouped cross-validation and NSGA-II give a 95% upper-confidence false-safe rate of zero on 160 held-out rows. The certified fronts collapse to two spans.
+
+Keywords: superelasticity; return mapping; inverse identification; diagrid frames; seismic drift; embodied carbon
+
+Related identifier: https://github.com/syednafizreja/diagrid-seismic-opt
